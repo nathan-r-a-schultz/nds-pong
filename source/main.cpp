@@ -13,25 +13,71 @@
 // add sprites
 // add music
 // add GUI
+// fix clipping bug with paddle and box
 
-void credAndChanges()
+void menu(int mode, int selection, int points)
 {
-	iprintf("\x1b[0;0H                                      \n");
-	iprintf("   \x1b[32m\x1b[1;0HProgram written by Natsch\n");
-	iprintf("   \x1b[30;2m\x1b[2;0HPrototype v1.3\n");
-	iprintf("   \x1b[30;2m\x1b[3;0HLatest changes:\n");
-	iprintf("   \x1b[30;2m\x1b[4;0HAdded pause functionality\n");
-	iprintf("   \x1b[30;2m\x1b[5;0HDecreased ball size\n");
-	iprintf("   \x1b[30;2m\x1b[5;0HAdded restarting game upon loss\n");
-}
 
-void clearPrint()
-{
-	iprintf("\x1b[8;0H                                      \n");
-
-	for (int i = 0; i < 9; i++)
+	switch (mode)
 	{
-		iprintf("                                      \n");
+	case 0:
+		iprintf("\x1b[0;0H                                      \n");
+		iprintf("   \x1b[30;2m\x1b[1;0H( )Controls\n");
+		iprintf("   \x1b[30;2m\x1b[2;0H( )Credits\n");
+		iprintf("   \x1b[30;2m\x1b[3;0H( )Version info\n");
+		//iprintf("   \x1b[30;2m\x1b[4;0H( )Debug\n");
+		//iprintf("   \x1b[30;2m\x1b[5;1HSelection: %i\n", selection);
+		iprintf("   \x1b[32;2m\x1b[18;0HPoints: %d\n", points);
+		iprintf("   \x1b[32m\x1b[20;0HTo navigate menus, use D-PAD UP\n");
+		iprintf("   \x1b[32m\x1b[21;0Hand DOWN. Press A to enter a\n");
+		iprintf("   \x1b[32m\x1b[22;0Hmenu and B to exit the menu.\n");
+		break;
+	case 1: // control info
+		iprintf("\x1b[0;0H                                      \n");
+		iprintf("   \x1b[30;2m\x1b[1;1H D-PAD LEFT to move the paddle\n");
+		iprintf("   \x1b[30;2m\x1b[2;1H left.                        \n");
+		iprintf("   \x1b[30;2m\x1b[3;1H D-PAD RIGHT to move the paddle\n");
+		iprintf("   \x1b[30;2m\x1b[4;1H right.                        \n");
+		iprintf("   \x1b[30;2m\x1b[5;1H SELECT to restart the game\n");
+		iprintf("   \x1b[30;2m\x1b[6;1H when you lose.                \n");
+		iprintf("   \x1b[30;2m\x1b[7;1H START to pause the game\n");
+		iprintf("   \x1b[30;2m\x1b[8;1H B to back out of submenus\n");
+		iprintf("   \x1b[30;2m\x1b[9;1H A to enter a submenu          \n");
+		iprintf("   \x1b[30;2m\x1b[10;1H D-PAD UP to navigate up menus\n");
+		iprintf("   \x1b[30;2m\x1b[11;1H D-PAD DOWN to navigate down\n");
+		iprintf("   \x1b[30;2m\x1b[12;1H menus.\n");
+		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		break;
+
+	case 2: // credits info
+		iprintf("   \x1b[30;2m\x1b[1;0HProgram written by Natratz\n");
+		// in earlier versions of this program I credit myself as Natsch but that username was taken on github so I'm going with Natratz now
+		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		break;
+	case 3: // changes info
+		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.4\n");
+		// last version was "Prototype v1.3" but I want prototype versions to be less than 1 so I'm changing it to 0.0.4
+		// when I get to alpha, it'll be 0.1.X and beta will be 0.2.X
+		iprintf("   \x1b[30;2m\x1b[3;0HLatest changes:\n");
+		iprintf("   \x1b[30;2m\x1b[4;0HNewly enhanced menu\n");
+		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		break;
+	}
+
+	if (mode == 0)
+	{
+		switch (selection)
+		{
+		case 0:
+			iprintf("   \x1b[32m\x1b[1;1H>\n");
+			break;
+		case 1:
+			iprintf("   \x1b[32m\x1b[2;1H>\n");
+			break;
+		case 2:
+			iprintf("   \x1b[32m\x1b[3;1H>\n");
+			break;
+		}
 	}
 }
 
@@ -50,11 +96,12 @@ int main(void)
 	int xPaddleLoc = 128 - paddleLength / 2;
 	int yPaddleLoc = 157;
 	float paddleSpeed = 10;
-	int speedTracker = 0;
+	int points = 0;
 	bool gameOver = false;
 	bool pause = false;
-
 	int debugMode = 1;
+	int menuMode = 0;
+	int menuSelection = 0;
 
 	// init console
 	consoleDemoInit();
@@ -71,7 +118,7 @@ int main(void)
 		glBoxFilled(xBoxLoc, yBoxLoc, xBoxLoc + boxLength, yBoxLoc + boxWidth, RGB15(255, 255, 0));
 		glBoxFilled(xPaddleLoc, yPaddleLoc, xPaddleLoc + paddleLength, yPaddleLoc + paddleWidth, RGB15(255, 255, 255));
 
-		if (pause == false) 
+		if (pause == false)
 		{
 			xBoxLoc += xBoxSpeed; // goes forward once every frame according to boxSpeed
 			yBoxLoc += yBoxSpeed; // goes down once every frame according to boxSpeed
@@ -79,8 +126,8 @@ int main(void)
 
 		if (xBoxLoc < xPaddleLoc + paddleLength && xBoxLoc + boxLength > xPaddleLoc && yBoxLoc + boxWidth >= yPaddleLoc && yBoxLoc <= yBoxLoc + paddleWidth) // checks if the box and paddle collide
 		{
-			speedTracker++;
-			if (speedTracker % 5 == 0 && speedTracker > 0) {
+			points++;
+			if (points % 5 == 0 && points > 0) {
 				// these if statements seem redundant but it fixes some bugs
 				if (xBoxSpeed > 0) {
 					xBoxSpeed = xBoxSpeed * 1.1; // increase speed
@@ -95,8 +142,7 @@ int main(void)
 					yBoxSpeed = yBoxSpeed * 1.1; // increase speed
 				}
 			}
-			yBoxSpeed *= -1;
-
+				yBoxSpeed *= -1;
 		}
 
 		if (xBoxLoc <= 0 || xBoxLoc + boxLength > 256) // handles bouncing for left and right
@@ -114,7 +160,6 @@ int main(void)
 			yBoxSpeed = 0;
 		}
 
-		
 
 		if (xPaddleLoc < 0) // prevents the paddle from going too far left
 		{
@@ -127,7 +172,7 @@ int main(void)
 		}
 
 		scanKeys();
-		
+
 		if (gameOver == false && pause == false) {
 			// changes location of the paddle based on which key is pressed
 			if (keysHeld() & KEY_LEFT && xPaddleLoc > 0)
@@ -143,26 +188,28 @@ int main(void)
 		// pause is false then enable debug mode upon keypress
 		if (pause == false && keysUp() & KEY_X)
 		{
-				if (debugMode == 0)
-				{
-					debugMode = 1;
-				}
-				else if (debugMode == 1)
-				{
-					debugMode = 0;
-				}
+			switch (debugMode)
+			{
+			case 0:
+				debugMode = 1;
+				break;
+			case 1:
+				debugMode = 0;
+				break;
+			}
 		}
-		
+
 		// pause game when the start key is pressed
 		if (keysUp() & KEY_START)
 		{
-			if (pause == false)
+			switch (pause)
 			{
+			case false:
 				pause = true;
-			}
-			else if (pause == true)
-			{
+				break;
+			case true:
 				pause = false;
+				break;
 			}
 		}
 
@@ -170,43 +217,71 @@ int main(void)
 		if (keysUp() & KEY_SELECT && gameOver == true)
 		{
 
-				gameOver = false;
-				xBoxLoc = 0;
-				yBoxLoc = 0;
-				xBoxSpeed = 1;
-				yBoxSpeed = 1;
-				speedTracker = 0;
+			gameOver = false;
+			xBoxLoc = 0;
+			yBoxLoc = 0;
+			xBoxSpeed = 1;
+			yBoxSpeed = 1;
+			points = 0;
 
 		}
 
-
-		if (debugMode == 1 && gameOver == false) 
+		if (keysUp() & KEY_B)
 		{
-
-			credAndChanges();
-			iprintf("\x1b[32m\x1b[10;0HDebug:\n");
-			iprintf("xBoxLoc: %03f\n", xBoxLoc);
-			iprintf("yBoxLoc: %03f\n", yBoxLoc);
-			iprintf("xBoxSpeed: %03f\n", xBoxSpeed);
-			iprintf("yBoxSpeed: %03f\n", yBoxSpeed);
-			iprintf("xPaddleLoc: %03i\n", xPaddleLoc);
-			iprintf("yPaddleLoc: %03i\n", yPaddleLoc);
-			iprintf("speedTracker: %03i\n", speedTracker);
-			iprintf("   \x1b[8;0H                      \n");
-
+			menuMode = 0;
 		}
-		else if (debugMode == 0 && gameOver == false)
+
+		if (keysUp() & KEY_A && menuMode == 0)
 		{
-			clearPrint();
-			credAndChanges();
-			iprintf("   \x1b[8;0H                      \n");
+			if (menuSelection == 0)
+			{
+				menuMode = 1;
+			}
+			else if (menuSelection == 1)
+			{
+				menuMode = 2;
+			}
+			else if (menuSelection == 2)
+			{
+				menuMode = 3;
+			}
+			else if (menuSelection == 3)
+			{
+				menuMode = 4;
+			}
 
 		}
-		if (gameOver == true)
+		
+		if (menuMode == 0)
 		{
-			iprintf("   \x1b[30;2m\x1b[8;0HPress SELECT to retry\n");
+			if (keysUp() & KEY_DOWN)
+			{
+				if (menuSelection >= 0 && menuSelection < 2)
+				{
+					menuSelection++;
+				}
+			}
+	
+			if (keysUp() & KEY_UP)
+			{
+				if (menuSelection > 0 && menuSelection <= 2)
+				{
+					menuSelection--;
+				}
+			}
 		}
 
+		if (menuSelection < 0)
+		{
+			menuSelection = 0;
+		}
+		else if (menuSelection > 3)
+		{
+			menuSelection = 3;
+		}
+
+		consoleClear();
+		menu(menuMode, menuSelection, points);
 		glEnd2D();
 		glFlush(0);
 		swiWaitForVBlank();
