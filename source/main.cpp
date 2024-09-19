@@ -1,8 +1,8 @@
-#include <nds.h>
-#include <gl2d.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <nds.h>
+#include <gl2d.h>
 
 // This code is a bit of a mess, especially with variables
 // I'm still learning C++ and this is more of an experiment than a legitimate game
@@ -21,19 +21,17 @@ void menu(int mode, int selection, int points)
 	switch (mode)
 	{
 	case 0:
-		iprintf("\x1b[0;0H                                      \n");
+		//iprintf("\x1b[1;0H                                \n");
 		iprintf("   \x1b[30;2m\x1b[1;0H( )Controls\n");
 		iprintf("   \x1b[30;2m\x1b[2;0H( )Credits\n");
 		iprintf("   \x1b[30;2m\x1b[3;0H( )Version info\n");
-		//iprintf("   \x1b[30;2m\x1b[4;0H( )Debug\n");
+		iprintf("   \x1b[30;2m\x1b[4;0H( )Debug\n");
+		iprintf("   \x1b[30;2m\x1b[5;0H( )kusahdkj\n");
 		//iprintf("   \x1b[30;2m\x1b[5;1HSelection: %i\n", selection);
-		iprintf("   \x1b[32;2m\x1b[18;0HPoints: %d\n", points);
-		iprintf("   \x1b[32m\x1b[20;0HTo navigate menus, use D-PAD UP\n");
-		iprintf("   \x1b[32m\x1b[21;0Hand DOWN. Press A to enter a\n");
-		iprintf("   \x1b[32m\x1b[22;0Hmenu and B to exit the menu.\n");
+
 		break;
 	case 1: // control info
-		iprintf("\x1b[0;0H                                      \n");
+		//iprintf("\x1b[0;0H                                      \n");
 		iprintf("   \x1b[30;2m\x1b[1;1H D-PAD LEFT to move the paddle\n");
 		iprintf("   \x1b[30;2m\x1b[2;1H left.                        \n");
 		iprintf("   \x1b[30;2m\x1b[3;1H D-PAD RIGHT to move the paddle\n");
@@ -50,16 +48,14 @@ void menu(int mode, int selection, int points)
 		break;
 
 	case 2: // credits info
-		iprintf("   \x1b[30;2m\x1b[1;0HProgram written by Natratz\n");
-		// in earlier versions of this program I credit myself as Natsch but that username was taken on github so I'm going with Natratz now
+		iprintf("   \x1b[30;2m\x1b[1;0HProgram written by Nathan Schultz\n");
 		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
 		break;
 	case 3: // changes info
-		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.4\n");
-		// last version was "Prototype v1.3" but I want prototype versions to be less than 1 so I'm changing it to 0.0.4
-		// when I get to alpha, it'll be 0.1.X and beta will be 0.2.X
+		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.5\n");
 		iprintf("   \x1b[30;2m\x1b[3;0HLatest changes:\n");
-		iprintf("   \x1b[30;2m\x1b[4;0HNewly enhanced menu\n");
+		iprintf("   \x1b[30;2m\x1b[4;0HBug fixes for the menus\n");
+		iprintf("   \x1b[30;2m\x1b[5;0HAdded debug mode\n");
 		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
 		break;
 	}
@@ -69,16 +65,33 @@ void menu(int mode, int selection, int points)
 		switch (selection)
 		{
 		case 0:
-			iprintf("   \x1b[32m\x1b[1;1H>\n");
+			// note that without the "\x1b[32m\x1b[15;0H" at the end of printf, this statement will print three blank characters
+			// these blank characters override previously printed characters
+			// we avoid overriding existing text by shoving the blank characters off screen (row 33, column 0)
+			// this applies for all cases
+			iprintf("\x1b[32m\x1b[1;1H>\x1b[32m\x1b[33;0H");
 			break;
 		case 1:
-			iprintf("   \x1b[32m\x1b[2;1H>\n");
+			iprintf("\x1b[32m\x1b[2;1H>\x1b[32m\x1b[33;0H");
 			break;
 		case 2:
-			iprintf("   \x1b[32m\x1b[3;1H>\n");
+			iprintf("\x1b[32m\x1b[3;1H>\x1b[32m\x1b[33;0H");
+			break;
+		case 3:
+			iprintf("\x1b[32m\x1b[4;1H>\x1b[32m\x1b[33;0H");
 			break;
 		}
 	}
+
+	//render the rest of the menu after selector has been moved
+	if (mode == 0) {
+		iprintf("   \x1b[32;2m\x1b[18;0HPoints: %d\n", points);
+		iprintf("   \x1b[32;2m\x1b[20;0HTo navigate menus, use D-PAD UP\n");
+		iprintf("   \x1b[32;2m\x1b[21;0Hand DOWN. Press A to enter a\n");
+		iprintf("   \x1b[32;2m\x1b[22;0Hmenu and B to exit the menu.\n");
+	}
+
+
 }
 
 int main(void)
@@ -256,7 +269,7 @@ int main(void)
 		{
 			if (keysUp() & KEY_DOWN)
 			{
-				if (menuSelection >= 0 && menuSelection < 2)
+				if (menuSelection >= 0 && menuSelection < 3)
 				{
 					menuSelection++;
 				}
@@ -264,7 +277,7 @@ int main(void)
 	
 			if (keysUp() & KEY_UP)
 			{
-				if (menuSelection > 0 && menuSelection <= 2)
+				if (menuSelection > 0 && menuSelection <= 3)
 				{
 					menuSelection--;
 				}
@@ -275,9 +288,9 @@ int main(void)
 		{
 			menuSelection = 0;
 		}
-		else if (menuSelection > 3)
+		else if (menuSelection > 4)
 		{
-			menuSelection = 3;
+			menuSelection = 4;
 		}
 
 		consoleClear();
