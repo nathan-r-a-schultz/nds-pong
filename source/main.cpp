@@ -4,59 +4,80 @@
 #include <nds.h>
 #include <gl2d.h>
 
-// This code is a bit of a mess, especially with variables
-// I'm still learning C++ and this is more of an experiment than a legitimate game
-// My goal is start with the basics and then learn more complex things
-// Any feedback or tips would be appreciated
-
 // TODO:
 // add sprites
 // add music
 // add GUI
 // fix clipping bug with paddle and box
 
-void menu(int mode, int selection, int points)
+void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPaddleLoc, int yPaddleLoc, float xBoxSpeed, float yBoxSpeed)
 {
+
+	// this code is part of a workaround to print floats
+	int xBoxSpeedInt = (int)(xBoxSpeed * 1000000);
+	int yBoxSpeedInt = (int)(yBoxSpeed * 1000000);
 
 	switch (mode)
 	{
-	case 0:
-		//iprintf("\x1b[1;0H                                \n");
+	case 0: // default menu
+		iprintf("   \x1b[30;2m\x1b[0;0HMain menu:\n");
 		iprintf("   \x1b[30;2m\x1b[1;0H( )Controls\n");
 		iprintf("   \x1b[30;2m\x1b[2;0H( )Credits\n");
 		iprintf("   \x1b[30;2m\x1b[3;0H( )Version info\n");
 		iprintf("   \x1b[30;2m\x1b[4;0H( )Debug\n");
-		iprintf("   \x1b[30;2m\x1b[5;0H( )kusahdkj\n");
-		//iprintf("   \x1b[30;2m\x1b[5;1HSelection: %i\n", selection);
-
 		break;
 	case 1: // control info
-		//iprintf("\x1b[0;0H                                      \n");
-		iprintf("   \x1b[30;2m\x1b[1;1H D-PAD LEFT to move the paddle\n");
-		iprintf("   \x1b[30;2m\x1b[2;1H left.                        \n");
-		iprintf("   \x1b[30;2m\x1b[3;1H D-PAD RIGHT to move the paddle\n");
-		iprintf("   \x1b[30;2m\x1b[4;1H right.                        \n");
-		iprintf("   \x1b[30;2m\x1b[5;1H SELECT to restart the game\n");
-		iprintf("   \x1b[30;2m\x1b[6;1H when you lose.                \n");
-		iprintf("   \x1b[30;2m\x1b[7;1H START to pause the game\n");
-		iprintf("   \x1b[30;2m\x1b[8;1H B to back out of submenus\n");
-		iprintf("   \x1b[30;2m\x1b[9;1H A to enter a submenu          \n");
-		iprintf("   \x1b[30;2m\x1b[10;1H D-PAD UP to navigate up menus\n");
-		iprintf("   \x1b[30;2m\x1b[11;1H D-PAD DOWN to navigate down\n");
-		iprintf("   \x1b[30;2m\x1b[12;1H menus.\n");
-		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		iprintf("   \x1b[30;2m\x1b[1;0HControls:\n");
+		iprintf("   \x1b[30;2m\x1b[3;0HD-PAD LEFT to move the paddle\n");
+		iprintf("   \x1b[30;2m\x1b[4;0Hleft.                        \n");
+		iprintf("   \x1b[30;2m\x1b[5;0H\n");
+		iprintf("   \x1b[30;2m\x1b[6;0HD-PAD RIGHT to move the paddle\n");
+		iprintf("   \x1b[30;2m\x1b[7;0Hright.                        \n");
+		iprintf("   \x1b[30;2m\x1b[8;0H\n");
+		iprintf("   \x1b[30;2m\x1b[9;0HSELECT to restart the game when\n");
+		iprintf("   \x1b[30;2m\x1b[10;0Hyou lose.                \n");
+		iprintf("   \x1b[30;2m\x1b[11;0H\n");
+		iprintf("   \x1b[30;2m\x1b[12;0HSTART to pause the game.\n");
+		iprintf("   \x1b[30;2m\x1b[13;0H\n");
+		iprintf("   \x1b[30;2m\x1b[14;0HB to back out of submenus.\n");
+		iprintf("   \x1b[30;2m\x1b[15;0H\n");
+		iprintf("   \x1b[30;2m\x1b[16;0HA to enter a submenu.          \n");
+		iprintf("   \x1b[30;2m\x1b[17;0H\n");
+		iprintf("   \x1b[30;2m\x1b[18;0HD-PAD UP to navigate up menus.\n");
+		iprintf("   \x1b[30;2m\x1b[19;0HD-PAD DOWN to navigate down\n");
+		iprintf("   \x1b[30;2m\x1b[20;0Hmenus.\n");
+		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
+
 		break;
 
 	case 2: // credits info
-		iprintf("   \x1b[30;2m\x1b[1;0HProgram written by Nathan Schultz\n");
-		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		iprintf("   \x1b[30;2m\x1b[1;0HCredits:\n");
+		iprintf("   \x1b[30;2m\x1b[2;0HCreated by Nathan Schultz\n");
+		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
 		break;
 	case 3: // changes info
-		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.5\n");
-		iprintf("   \x1b[30;2m\x1b[3;0HLatest changes:\n");
-		iprintf("   \x1b[30;2m\x1b[4;0HBug fixes for the menus\n");
-		iprintf("   \x1b[30;2m\x1b[5;0HAdded debug mode\n");
-		iprintf("   \x1b[32m\x1b[21;1HPress B to exit submenu\n");
+		iprintf("   \x1b[30;2m\x1b[1;0HVersion info:\n");
+		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.6\n");
+		iprintf("   \x1b[30;2m\x1b[4;0HLatest changes:\n");
+		iprintf("   \x1b[30;2m\x1b[5;0HPopulated debug mode\n");
+		iprintf("   \x1b[30;2m\x1b[6;0HCleaned up the main menu\n");
+		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
+		break;
+	case 4:
+		iprintf("   \x1b[32;2m\x1b[1;0HPoints: %d\n", points);
+		iprintf("   \x1b[32;2m\x1b[2;0HxBoxLoc: %d\n", xBoxLoc);
+		iprintf("   \x1b[32;2m\x1b[3;0HyBoxLoc: %d\n", yBoxLoc);
+		iprintf("   \x1b[32;2m\x1b[4;0HxPaddleLoc: %d\n", xPaddleLoc);
+		iprintf("   \x1b[32;2m\x1b[5;0HyPaddleLoc: %d\n", yPaddleLoc);
+
+		// the following code is a workout to print floats
+		iprintf("   \x1b[32;2m\x1b[6;0HxBoxSpeed: %d.%06d\n", xBoxSpeedInt / 1000000, abs(xBoxSpeedInt % 1000000));
+		iprintf("   \x1b[32;2m\x1b[7;0HyBoxSpeed: %d.%06d\n", yBoxSpeedInt / 1000000, abs(yBoxSpeedInt % 1000000));
+
+		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
+		break;
+	default: // menu to handle errors in case of an invalid mode
+		iprintf("   \x1b[30;2m\x1b[1;0HError 0000");
 		break;
 	}
 
@@ -91,7 +112,6 @@ void menu(int mode, int selection, int points)
 		iprintf("   \x1b[32;2m\x1b[22;0Hmenu and B to exit the menu.\n");
 	}
 
-
 }
 
 int main(void)
@@ -112,7 +132,6 @@ int main(void)
 	int points = 0;
 	bool gameOver = false;
 	bool pause = false;
-	int debugMode = 1;
 	int menuMode = 0;
 	int menuSelection = 0;
 
@@ -198,20 +217,6 @@ int main(void)
 			}
 		}
 
-		// pause is false then enable debug mode upon keypress
-		if (pause == false && keysUp() & KEY_X)
-		{
-			switch (debugMode)
-			{
-			case 0:
-				debugMode = 1;
-				break;
-			case 1:
-				debugMode = 0;
-				break;
-			}
-		}
-
 		// pause game when the start key is pressed
 		if (keysUp() & KEY_START)
 		{
@@ -294,7 +299,7 @@ int main(void)
 		}
 
 		consoleClear();
-		menu(menuMode, menuSelection, points);
+		menu(menuMode, menuSelection, points, xBoxLoc, yBoxLoc, xPaddleLoc, yPaddleLoc, xBoxSpeed, yBoxSpeed);
 		glEnd2D();
 		glFlush(0);
 		swiWaitForVBlank();
