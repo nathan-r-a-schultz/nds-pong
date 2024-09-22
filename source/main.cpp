@@ -59,11 +59,10 @@ void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPa
 		iprintf("   \x1b[30;2m\x1b[1;0HVersion info:\n");
 		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.6\n");
 		iprintf("   \x1b[30;2m\x1b[4;0HLatest changes:\n");
-		iprintf("   \x1b[30;2m\x1b[5;0HPopulated debug mode\n");
-		iprintf("   \x1b[30;2m\x1b[6;0HCleaned up the main menu\n");
+		iprintf("   \x1b[30;2m\x1b[5;0HIncreased visual clarity for the paddle and ball\n");
 		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
 		break;
-	case 4:
+	case 4: // debug info
 		iprintf("   \x1b[32;2m\x1b[1;0HPoints: %d\n", points);
 		iprintf("   \x1b[32;2m\x1b[2;0HxBoxLoc: %d\n", xBoxLoc);
 		iprintf("   \x1b[32;2m\x1b[3;0HyBoxLoc: %d\n", yBoxLoc);
@@ -147,8 +146,13 @@ int main(void)
 
 		glBegin2D();
 
-		glBoxFilled(xBoxLoc, yBoxLoc, xBoxLoc + boxLength, yBoxLoc + boxWidth, RGB15(255, 255, 0));
+		// ball graphics
+		glBoxFilled(xBoxLoc, yBoxLoc, xBoxLoc + boxLength, yBoxLoc + boxWidth, RGB15(255, 255, 255));
+		glBoxFilled(xBoxLoc + 1, yBoxLoc + 1, xBoxLoc + boxLength - 1, yBoxLoc + boxWidth - 1, RGB15(255, 255, 0));
+
+		// paddle graphics
 		glBoxFilled(xPaddleLoc, yPaddleLoc, xPaddleLoc + paddleLength, yPaddleLoc + paddleWidth, RGB15(255, 255, 255));
+		glBoxFilled(xPaddleLoc + 1, yPaddleLoc + 1, xPaddleLoc + paddleLength - 1, yPaddleLoc + paddleWidth - 1, RGB15(212, 212, 212));
 
 		if (pause == false)
 		{
