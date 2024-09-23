@@ -12,6 +12,7 @@ public:
     int getY() const;
     int getLength() const;
     int getWidth() const;
+    void render() const;
 
 private:
     int length, width;

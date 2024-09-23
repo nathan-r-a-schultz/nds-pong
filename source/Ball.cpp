@@ -1,3 +1,5 @@
+#include <nds.h>
+#include <gl2d.h>
 #include "Ball.h"
 
 Ball::Ball(int width, int height, float xSpeed, float ySpeed)
@@ -71,4 +73,9 @@ int Ball::getWidth() const {
 
 int Ball::getHeight() const {
     return height;
+}
+
+void Ball::render() const {
+    glBoxFilled(x, y, x + width, y + height, RGB15(255, 255, 255));
+    glBoxFilled(x + 1, y + 1, x + width - 1, y + height - 1, RGB15(255, 255, 0));
 }

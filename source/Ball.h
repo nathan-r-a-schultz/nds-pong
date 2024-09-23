@@ -23,6 +23,7 @@ public:
     float getSpeedY() const;
     int getWidth() const;
     int getHeight() const;
+    void render() const;
 
 private:
     mutable int x, y;

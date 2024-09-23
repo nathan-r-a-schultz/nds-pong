@@ -59,9 +59,9 @@ void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPa
 		break;
 	case 3: // changes info
 		iprintf("   \x1b[30;2m\x1b[1;0HVersion info:\n");
-		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.6\n");
+		iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.8\n");
 		iprintf("   \x1b[30;2m\x1b[4;0HLatest changes:\n");
-		iprintf("   \x1b[30;2m\x1b[5;0HIncreased visual clarity for the paddle and ball\n");
+		iprintf("   \x1b[30;2m\x1b[5;0HInternal code changes\n");
 		iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
 		break;
 	case 4: // debug info
@@ -118,6 +118,7 @@ void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPa
 int main(void)
 {
 
+	// init objects
 	Paddle paddle(50, 10, 128 - 50 / 2, 157, 10);
     Ball ball(10, 10, 1.0f, 1.0f);
 
@@ -139,13 +140,8 @@ int main(void)
 
 		glBegin2D();
 
-		 // Draw ball
-        glBoxFilled(ball.getX(), ball.getY(), ball.getX() + ball.getWidth(), ball.getY() + ball.getHeight(), RGB15(255, 255, 255));
-        glBoxFilled(ball.getX() + 1, ball.getY() + 1, ball.getX() + ball.getWidth() - 1, ball.getY() + ball.getHeight() - 1, RGB15(255, 255, 0));
-
-        // Draw paddle
-        glBoxFilled(paddle.getX(), paddle.getY(), paddle.getX() + paddle.getLength(), paddle.getY() + paddle.getWidth(), RGB15(255, 255, 255));
-        glBoxFilled(paddle.getX() + 1, paddle.getY() + 1, paddle.getX() + paddle.getLength() - 1, paddle.getY() + paddle.getWidth() - 1, RGB15(212, 212, 212));
+		ball.render();
+		paddle.render();
 
 		if (!pause) {
             ball.updatePosition();
