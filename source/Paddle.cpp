@@ -13,6 +13,15 @@ void Paddle::moveRight() {
     x += speed;
 }
 
+void Paddle::constrainPosition() {
+    if (x < 0) {
+        x = 0;
+    }
+    if (x > 255 - length) {
+        x = 255 - length;
+    }
+}
+
 int Paddle::getX() const {
     return x;
 }
@@ -32,4 +41,9 @@ int Paddle::getWidth() const {
 void Paddle::render() const {
     glBoxFilled(x, y, x + length, y + width, RGB15(255, 255, 255));
     glBoxFilled(x + 1, y + 1, x + length - 1, y + width - 1, RGB15(212, 212, 212));
+}
+
+void Paddle::reset() const {
+    x = 128 - 50 / 2;
+    y = 157;
 }

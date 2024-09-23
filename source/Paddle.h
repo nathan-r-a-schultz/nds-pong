@@ -7,16 +7,18 @@ public:
 
     void moveLeft();
     void moveRight();
+    void constrainPosition();
 
     int getX() const;
     int getY() const;
     int getLength() const;
     int getWidth() const;
     void render() const;
+    void reset() const;
 
 private:
     int length, width;
-    int x, y;
+    mutable int x, y;
     float speed;
 };
 
