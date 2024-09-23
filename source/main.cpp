@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <nds.h>
 #include <gl2d.h>
+#include "Paddle.h"
+#include "Ball.h"
 
 // TODO:
 // add sprites
@@ -116,18 +118,9 @@ void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPa
 int main(void)
 {
 
-	// these variables are pretty self explanatory
-	float xBoxLoc = 0;
-	float yBoxLoc = 0;
-	int boxLength = 10;
-	int boxWidth = 10;
-	float xBoxSpeed = 1.0;
-	float yBoxSpeed = 1.0;
-	int paddleLength = 50;
-	int paddleWidth = 10;
-	int xPaddleLoc = 128 - paddleLength / 2;
-	int yPaddleLoc = 157;
-	float paddleSpeed = 10;
+	Paddle paddle(50, 10, 128 - 50 / 2, 157, 10);
+    Ball ball(10, 10, 1.0f, 1.0f);
+
 	int points = 0;
 	bool gameOver = false;
 	bool pause = false;
@@ -146,78 +139,49 @@ int main(void)
 
 		glBegin2D();
 
-		// ball graphics
-		glBoxFilled(xBoxLoc, yBoxLoc, xBoxLoc + boxLength, yBoxLoc + boxWidth, RGB15(255, 255, 255));
-		glBoxFilled(xBoxLoc + 1, yBoxLoc + 1, xBoxLoc + boxLength - 1, yBoxLoc + boxWidth - 1, RGB15(255, 255, 0));
+		 // Draw ball
+        glBoxFilled(ball.getX(), ball.getY(), ball.getX() + ball.getWidth(), ball.getY() + ball.getHeight(), RGB15(255, 255, 255));
+        glBoxFilled(ball.getX() + 1, ball.getY() + 1, ball.getX() + ball.getWidth() - 1, ball.getY() + ball.getHeight() - 1, RGB15(255, 255, 0));
 
-		// paddle graphics
-		glBoxFilled(xPaddleLoc, yPaddleLoc, xPaddleLoc + paddleLength, yPaddleLoc + paddleWidth, RGB15(255, 255, 255));
-		glBoxFilled(xPaddleLoc + 1, yPaddleLoc + 1, xPaddleLoc + paddleLength - 1, yPaddleLoc + paddleWidth - 1, RGB15(212, 212, 212));
+        // Draw paddle
+        glBoxFilled(paddle.getX(), paddle.getY(), paddle.getX() + paddle.getLength(), paddle.getY() + paddle.getWidth(), RGB15(255, 255, 255));
+        glBoxFilled(paddle.getX() + 1, paddle.getY() + 1, paddle.getX() + paddle.getLength() - 1, paddle.getY() + paddle.getWidth() - 1, RGB15(212, 212, 212));
 
-		if (pause == false)
-		{
-			xBoxLoc += xBoxSpeed; // goes forward once every frame according to boxSpeed
-			yBoxLoc += yBoxSpeed; // goes down once every frame according to boxSpeed
-		}
+		if (!pause) {
+            ball.updatePosition();
+        }
 
-		if (xBoxLoc < xPaddleLoc + paddleLength && xBoxLoc + boxLength > xPaddleLoc && yBoxLoc + boxWidth >= yPaddleLoc && yBoxLoc <= yBoxLoc + paddleWidth) // checks if the box and paddle collide
-		{
-			points++;
-			if (points % 5 == 0 && points > 0) {
-				// these if statements seem redundant but it fixes some bugs
-				if (xBoxSpeed > 0) {
-					xBoxSpeed = xBoxSpeed * 1.1; // increase speed
-				}
-				else if (xBoxSpeed < 0) {
-					xBoxSpeed = xBoxSpeed * 1.1; // increase speed
-				}
-				if (yBoxSpeed > 0) {
-					yBoxSpeed = yBoxSpeed * 1.1; // increase speed
-				}
-				else if (yBoxSpeed < 0) {
-					yBoxSpeed = yBoxSpeed * 1.1; // increase speed
-				}
-			}
-				yBoxSpeed *= -1;
-		}
+        if (ball.checkCollision(paddle.getX(), paddle.getY(), paddle.getLength(), paddle.getWidth())) {
+            points++;
+            ball.reverseY();
+            if (points % 5 == 0) {
+                ball.increaseSpeed();
+            }
+        }
 
-		if (xBoxLoc <= 0 || xBoxLoc + boxLength > 256) // handles bouncing for left and right
-		{
-			xBoxSpeed = xBoxSpeed * -1.0;
-		}
-		if (yBoxLoc <= 0) // handles bouncing for top and bottom
-		{
-			yBoxSpeed = yBoxSpeed * -1.0;
-		}
-		if (yBoxLoc + boxWidth > 191)
-		{
-			gameOver = true;
-			xBoxSpeed = 0;
-			yBoxSpeed = 0;
-		}
+		if (ball.getX() <= 0 || ball.getX() + ball.getWidth() > 256) {
+            ball.reverseX();
+        }
+        if (ball.getY() <= 0) {
+            ball.reverseY();
+        }
 
-
-		if (xPaddleLoc < 0) // prevents the paddle from going too far left
-		{
-			xPaddleLoc = 0;
-		}
-
-		if (xPaddleLoc > 255 - paddleLength) // prevents the paddle from going too far right
-		{
-			xPaddleLoc = 255 - paddleLength;
-		}
+		if (ball.isOutOfBounds()) {
+            gameOver = true;
+            ball.reset();
+        }
 
 		scanKeys();
 
 		if (gameOver == false && pause == false) {
 			// changes location of the paddle based on which key is pressed
-			if (keysHeld() & KEY_LEFT && xPaddleLoc > 0)
+			if (keysHeld() & KEY_LEFT && paddle.getX() > 0)
 			{
-				xPaddleLoc -= paddleSpeed;
+				paddle.moveLeft();
 			}
-			if (keysHeld() & KEY_RIGHT && xPaddleLoc < 255 - paddleLength)
+			if (keysHeld() & KEY_RIGHT && paddle.getX() < 255 - paddle.getLength() - 1)
 			{
-				xPaddleLoc += paddleSpeed;
+				paddle.moveRight();
 			}
 		}
 
@@ -240,10 +204,7 @@ int main(void)
 		{
 
 			gameOver = false;
-			xBoxLoc = 0;
-			yBoxLoc = 0;
-			xBoxSpeed = 1;
-			yBoxSpeed = 1;
+			ball.reset();
 			points = 0;
 
 		}
@@ -303,7 +264,7 @@ int main(void)
 		}
 
 		consoleClear();
-		menu(menuMode, menuSelection, points, xBoxLoc, yBoxLoc, xPaddleLoc, yPaddleLoc, xBoxSpeed, yBoxSpeed);
+		menu(menuMode, menuSelection, points, ball.getX(), ball.getY(), paddle.getX(), paddle.getY(), ball.getSpeedX(), ball.getSpeedY());
 		glEnd2D();
 		glFlush(0);
 		swiWaitForVBlank();
