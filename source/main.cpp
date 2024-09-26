@@ -60,17 +60,9 @@ void menu(int mode, int selection, int points, int xBoxLoc, int yBoxLoc, int xPa
 			break;
 		case 3: // changes info
 			iprintf("   \x1b[30;2m\x1b[1;0HVersion info:\n");
-			iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.9\n");
+			iprintf("   \x1b[30;2m\x1b[2;0HPrototype v0.0.11\n");
 			iprintf("   \x1b[30;2m\x1b[4;0HLatest changes:\n");
-			iprintf("   \x1b[30;2m\x1b[5;0HFixed paddle going slightly too far left and right.\n");
-			iprintf("   \x1b[30;2m\x1b[7;0HAdded prompt to reset after\n");
-			iprintf("   \x1b[30;2m\x1b[8;0Hlosing.\n");
-			iprintf("   \x1b[30;2m\x1b[9;0HPrevented paddle from being\n");
-			iprintf("   \x1b[30;2m\x1b[10;0Hmoved after losing.\n");
-			iprintf("   \x1b[30;2m\x1b[11;0HReset paddle's position upon\n");
-			iprintf("   \x1b[30;2m\x1b[12;0Hlosing.\n");
-			iprintf("   \x1b[30;2m\x1b[13;0HFixed several issues with inputs\n");
-			iprintf("   \x1b[30;2m\x1b[14;0Hbeing accepted after game over.\n");
+			iprintf("   \x1b[30;2m\x1b[5;0HInternal code changes.\n");
 			iprintf("   \x1b[32m\x1b[22;0HPress B to exit submenu\n");
 			break;
 		case 4: // debug info
